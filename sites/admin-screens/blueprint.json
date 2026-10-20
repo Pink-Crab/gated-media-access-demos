@@ -1,0 +1,64 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"meta": {
+		"title": "Gated Media Access: Administrator screens",
+		"description": "Signed in as the administrator, with groups, products, coupons, payments and access from every source. Opens on the Access list.",
+		"author": "Pink-Crab"
+	},
+	"landingPage": "/wp-admin/edit.php?post_type=gatedmedia_access",
+	"preferredVersions": {
+		"php": "8.3",
+		"wp": "latest"
+	},
+	"steps": [
+		{
+			"step": "setSiteOptions",
+			"options": {
+				"permalink_structure": "/%postname%/"
+			}
+		},
+		{
+			"step": "installPlugin",
+			"pluginData": {
+				"resource": "url",
+				"url": "https://github.com/a8cteam51/restrict-media-file-access/releases/latest/download/restrict-media-file-access.zip"
+			}
+		},
+		{
+			"step": "installPlugin",
+			"pluginData": {
+				"resource": "url",
+				"url": "https://github.com/Pink-Crab/PinkCrab-Gated-Media-Access-Plugin/releases/latest/download/gated-media-access.zip"
+			}
+		},
+		{
+			"step": "mkdir",
+			"path": "/wordpress/gma-demo"
+		},
+		{
+			"step": "writeFile",
+			"path": "/wordpress/gma-demo/demo.php",
+			"data": {
+				"resource": "url",
+				"url": "https://raw.githubusercontent.com/Pink-Crab/gated-media-access-demos/main/core/demo.php"
+			}
+		},
+		{
+			"step": "writeFile",
+			"path": "/wordpress/gma-demo/seed.php",
+			"data": {
+				"resource": "url",
+				"url": "https://raw.githubusercontent.com/Pink-Crab/gated-media-access-demos/main/sites/admin-screens/seed.php"
+			}
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php require '/wordpress/wp-load.php'; require '/wordpress/gma-demo/demo.php'; require '/wordpress/gma-demo/seed.php';"
+		},
+		{
+			"step": "login",
+			"username": "admin",
+			"password": "password"
+		}
+	]
+}
