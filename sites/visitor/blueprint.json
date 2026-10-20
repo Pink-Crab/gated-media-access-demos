@@ -33,6 +33,42 @@
 		},
 		{
 			"step": "mkdir",
+			"path": "/wordpress/wp-content/mu-plugins/gma-showcase"
+		},
+		{
+			"step": "writeFile",
+			"path": "/wordpress/wp-content/mu-plugins/gma-showcase.php",
+			"data": {
+				"resource": "url",
+				"url": "https://raw.githubusercontent.com/Pink-Crab/gated-media-access-demos/main/showcase/gma-showcase.php"
+			}
+		},
+		{
+			"step": "writeFile",
+			"path": "/wordpress/wp-content/mu-plugins/gma-showcase/guides.php",
+			"data": {
+				"resource": "url",
+				"url": "https://raw.githubusercontent.com/Pink-Crab/gated-media-access-demos/main/showcase/gma-showcase/guides.php"
+			}
+		},
+		{
+			"step": "writeFile",
+			"path": "/wordpress/wp-content/mu-plugins/gma-showcase/showcase.js",
+			"data": {
+				"resource": "url",
+				"url": "https://raw.githubusercontent.com/Pink-Crab/gated-media-access-demos/main/showcase/gma-showcase/showcase.js"
+			}
+		},
+		{
+			"step": "writeFile",
+			"path": "/wordpress/wp-content/mu-plugins/gma-showcase/showcase.css",
+			"data": {
+				"resource": "url",
+				"url": "https://raw.githubusercontent.com/Pink-Crab/gated-media-access-demos/main/showcase/gma-showcase/showcase.css"
+			}
+		},
+		{
+			"step": "mkdir",
 			"path": "/wordpress/gma-demo"
 		},
 		{

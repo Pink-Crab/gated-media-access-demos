@@ -244,21 +244,84 @@ function paragraphs( string $text ): string {
 }
 
 /**
- * The page the demo opens on: what this demo shows and links to try.
+ * A heading block.
  *
- * @param string                       $intro A line or two about the demo.
- * @param array<int, array{0: string, 1: string, 2: string}> $steps Link text, URL and what to expect, per step.
+ * @param string $text  The heading.
+ * @param int    $level 2 or 3.
  */
-function start_page( string $intro, array $steps ): int {
-	$items = array_map(
-		static fn ( array $step ): string => '<!-- wp:list-item --><li><a href="' . esc_url( $step[1] ) . '">' . esc_html( $step[0] ) . '</a>: ' . esc_html( $step[2] ) . '</li><!-- /wp:list-item -->',
-		$steps
+function heading( string $text, int $level = 2 ): string {
+	$attributes = 2 === $level ? '' : ' {"level":' . $level . '}';
+
+	return "<!-- wp:heading{$attributes} -->\n<h{$level} class=\"wp-block-heading\">" . esc_html( $text ) . "</h{$level}>\n<!-- /wp:heading -->";
+}
+
+/**
+ * A bulleted list block.
+ *
+ * @param array<string> $items Each item's HTML.
+ */
+function bullets( array $items ): string {
+	$items = array_map( static fn ( string $item ): string => '<!-- wp:list-item --><li>' . $item . '</li><!-- /wp:list-item -->', $items );
+
+	return "<!-- wp:list -->\n<ul class=\"wp-block-list\">" . implode( '', $items ) . "</ul>\n<!-- /wp:list -->";
+}
+
+/** Where the plugin keeps its documentation screenshots. */
+const SCREENSHOTS = 'https://raw.githubusercontent.com/Pink-Crab/PinkCrab-Gated-Media-Access-Plugin/main/docs/images/';
+
+/**
+ * A screenshot from the plugin's documentation, as an image block.
+ *
+ * @param string $file The file in docs/images.
+ * @param string $alt  What it shows.
+ */
+function screenshot( string $file, string $alt ): string {
+	return "<!-- wp:image {\"sizeSlug\":\"large\",\"style\":{\"border\":{\"width\":\"1px\",\"color\":\"#cccccc\",\"radius\":\"8px\"}}} -->\n<figure class=\"wp-block-image size-large has-custom-border\"><img src=\"" . esc_url( SCREENSHOTS . $file ) . '" alt="' . esc_attr( $alt ) . "\" class=\"has-border-color\" style=\"border-color:#cccccc;border-width:1px;border-radius:8px\"/><figcaption class=\"wp-element-caption\">The same screen in the plugin's documentation, with different sample data. The link below opens it in this demo.</figcaption></figure>\n<!-- /wp:image -->";
+}
+
+/**
+ * The same three ideas on every Start here page.
+ */
+function how_it_works(): string {
+	return heading( 'How Gated Media Access works' )
+		. "\n\n" . paragraphs( 'Gated Media Access puts posts, pages and files behind access, and decides who gets in. Everything in this demo comes down to three ideas.' )
+		. "\n\n" . bullets(
+			array(
+				'<strong>Groups.</strong> Put a post, page or file in a group and it is restricted. Give someone the group and they can see everything in it, including anything you add to it later. Nobody else can: a restricted post is a 404 for them, and a restricted file is never sent.',
+				'<strong>Access records.</strong> Each time someone is given something, one record is written: who, what, for how long, and where it came from. It might come from an administrator, a purchase, a free claim, or another system telling the site someone has paid.',
+				'<strong>Products.</strong> A price, a duration and what it grants. Buyers pay through Stripe. Free products, and coupons that take the price to nothing, give access straight away with no payment at all.',
+			)
+		);
+}
+
+/**
+ * The page the demo opens on: what this demo is, who is in it, and a guided tour.
+ *
+ * @param array<string>                                                           $intro  Opening paragraphs.
+ * @param array<string>                                                           $people Who is who, one HTML line each.
+ * @param array<int, array{title: string, url: string, link: string, text: string}> $tour   One stop per feature: its heading, the screen to open, the link text, and what it is and what to look for (one paragraph per line).
+ * @param string                                                                  $note   A closing paragraph, '' for none.
+ */
+function start_page( array $intro, array $people, array $tour, string $note = '' ): int {
+	$stops = array_map(
+		static fn ( array $stop, int $index ): string => '<!-- wp:details' . ( 0 === $index ? ' {"showContent":true}' : '' ) . " -->\n"
+			. '<details class="wp-block-details"' . ( 0 === $index ? ' open' : '' ) . '><summary>' . esc_html( $stop['title'] ) . "</summary>\n\n"
+			. paragraphs( $stop['text'] )
+			. ( empty( $stop['image'] ) ? '' : "\n\n" . screenshot( $stop['image'], $stop['title'] ) )
+			. ( '' === $stop['url'] ? '' : "\n\n" . paragraphs( '<a href="' . esc_url( $stop['url'] ) . '">' . esc_html( $stop['link'] ) . ' &rarr;</a>' ) )
+			. "\n\n</details>\n<!-- /wp:details -->",
+		$tour,
+		array_keys( $tour )
 	);
 
-	$content = paragraphs( esc_html( $intro ) )
-		. "\n\n<!-- wp:heading -->\n<h2 class=\"wp-block-heading\">Try this</h2>\n<!-- /wp:heading -->\n\n"
-		. "<!-- wp:list {\"ordered\":true} -->\n<ol class=\"wp-block-list\">" . implode( '', $items ) . "</ol>\n<!-- /wp:list -->\n\n"
-		. paragraphs( 'Every demo account uses the password <code>' . PASSWORD . '</code>. Administrator: <code>admin</code> / <code>password</code>.' );
+	$content = paragraphs( implode( "\n", $intro ) )
+		. "\n\n" . how_it_works()
+		. "\n\n" . heading( 'Who is who' )
+		. "\n\n" . bullets( $people )
+		. "\n\n" . heading( 'The tour' )
+		. "\n\n" . implode( "\n\n", $stops )
+		. "\n\n" . heading( 'Signing in' )
+		. "\n\n" . paragraphs( 'Every customer in this demo signs in with their first name in lower case and the password <code>' . PASSWORD . '</code>, for example <code>sam</code> / <code>' . PASSWORD . '</code>. The administrator is <code>admin</code> / <code>password</code>. Nothing here is real: the site lives in your browser and is gone when you close the tab.' . ( '' === $note ? '' : "\n" . $note ) );
 
 	$page = (int) wp_insert_post(
 		array(

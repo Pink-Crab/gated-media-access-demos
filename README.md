@@ -22,10 +22,18 @@ Paying through Stripe cannot be shown: Stripe confirms a payment by calling the 
 ```
 core/demo.php            the shared content: customers, groups, posts, PDFs, products, coupons, the Start here page
 sites/<demo>/
-  blueprint.json         installs both plugins, copies the two PHP files in, runs them, signs in
-  seed.php               the access records this demo starts with, and its Start here steps
+  blueprint.json         installs both plugins and the showcase, copies the seed files in, runs them, signs in
+  seed.php               the access records this demo starts with, and its Start here tour
+showcase/                copied into wp-content/mu-plugins by every blueprint
+  gma-showcase.php       works out which plugin screen is open and prints its guide
+  gma-showcase/guides.php  what each screen shows: the panel's text and the numbered markers
+  gma-showcase/showcase.js, showcase.css  the "What am I looking at?" panel and the markers' tooltips
 index.html               the launcher, served by GitHub Pages
 ```
+
+Every Gated Media Access screen in a demo, in the dashboard and the account area, gets a "What am I looking at?" panel explaining it, and numbered markers on its key parts that explain them on hover or keyboard focus. The Start here page explains the plugin, who is who in the demo, and walks through it step by step, each step an expandable panel with a screenshot.
+
+Downloads cannot be tried in the demos, because the site runs inside the browser; the demos say so where files appear.
 
 The blueprints install the latest release of each plugin. Seeding goes through the plugin's own classes (`Access_Writer` for access records, `Checkout` for purchases), so the records are the ones the plugin itself would write.
 
